@@ -1,0 +1,31 @@
+categoria,pregunta,respuesta,orden
+evento,¿Qué es el Encuentro Mundial de Valores?,,10
+evento,¿Quién organiza el Encuentro?,,20
+evento,¿Cuál es el objetivo del Encuentro?,,30
+evento,¿A quién está dirigido?,,40
+fechas,¿Cuándo es el Encuentro?,,50
+fechas,¿Cuál es el horario de cada día?,,60
+fechas,¿Hasta cuándo puedo registrarme?,,70
+sede,¿Dónde se realiza el Encuentro?,,80
+sede,¿Cuál es la dirección exacta de la sede?,,90
+sede,¿Cómo llego en transporte público?,,100
+sede,¿Hay estacionamiento disponible?,,110
+registro,¿Cómo me registro?,,120
+registro,¿Cuál es el costo de entrada?,,130
+registro,¿Hay descuentos para estudiantes o grupos?,,140
+registro,¿Qué formas de pago aceptan?,,150
+registro,¿Puedo transferir o cancelar mi boleto?,,160
+registro,¿Necesito imprimir mi boleto?,,170
+programa,¿Quiénes son los ponentes?,,180
+programa,¿Cuáles son los temas que se van a tratar?,,190
+programa,¿Habrá talleres o actividades además de las conferencias?,,200
+programa,¿Se entrega constancia o certificado?,,210
+logistica,¿Se puede entrar y salir del recinto?,,220
+logistica,¿Habrá venta de alimentos?,,230
+logistica,¿Puedo llevar niños?,,240
+logistica,¿Está permitido tomar fotos o video?,,250
+accesibilidad,¿El lugar es accesible para sillas de ruedas?,,260
+accesibilidad,¿Habrá interpretación en lengua de señas?,,270
+hospedaje,¿Tienen convenio con hoteles cercanos?,,280
+contacto,¿Cómo contacto a los organizadores?,,290
+contacto,¿Tienen redes sociales oficiales?,,300

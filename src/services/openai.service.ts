@@ -1,5 +1,10 @@
 import OpenAI from "openai";
 
+import {
+  formatearParaPrompt,
+  obtenerConocimiento,
+} from "./knowledge.service.js";
+
 let client: OpenAI | null = null;
 
 // El cliente se crea la primera vez que se usa, no al importar el módulo.
@@ -18,7 +23,7 @@ function getClient(): OpenAI {
   return client;
 }
 
-const INSTRUCTIONS = `
+const REGLAS = `
 Eres el asistente virtual oficial del Encuentro Mundial de Valores.
 
 Tu función es responder preguntas sobre el evento.
@@ -26,15 +31,17 @@ Tu función es responder preguntas sobre el evento.
 Reglas:
 - Responde en español.
 - Sé amable y claro.
-- No inventes información.
-- Si no conoces una respuesta, dilo claramente.
-- No afirmes información que no esté en la base de conocimiento.
+- Responde ÚNICAMENTE con lo que aparece en la BASE DE CONOCIMIENTO de abajo.
+- Si la respuesta no está ahí, dilo con claridad e invita a escribir a los
+  organizadores. Nunca inventes fechas, precios, direcciones ni nombres.
+- No menciones que existe una "base de conocimiento": habla con naturalidad.
+- Responde breve, en dos o tres frases, salvo que pidan detalle.
 `;
 
 export async function generateResponse(userMessage: string): Promise<string> {
   // Los tipos de TypeScript no existen en tiempo de ejecución. Los webhooks
-  // de Meta (Etapa 6) llamarán a esta función con datos de fuera, así que
-  // el string se valida aquí también y no solo en la ruta.
+  // de Meta llaman a esta función con datos de fuera, así que el string se
+  // valida aquí también y no solo en la ruta.
   if (typeof userMessage !== "string") {
     throw new Error("userMessage debe ser un string");
   }
@@ -45,9 +52,11 @@ export async function generateResponse(userMessage: string): Promise<string> {
     throw new Error("Falta OPENAI_MODEL en el archivo .env");
   }
 
+  const conocimiento = await obtenerConocimiento();
+
   const response = await getClient().responses.create({
     model,
-    instructions: INSTRUCTIONS,
+    instructions: `${REGLAS}\n\nBASE DE CONOCIMIENTO:\n\n${formatearParaPrompt(conocimiento)}`,
     input: userMessage,
   });
 

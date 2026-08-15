@@ -22,6 +22,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
     "@vercel/functions": "^3.9.3",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
