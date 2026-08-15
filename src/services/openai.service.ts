@@ -32,6 +32,13 @@ Reglas:
 `;
 
 export async function generateResponse(userMessage: string): Promise<string> {
+  // Los tipos de TypeScript no existen en tiempo de ejecución. Los webhooks
+  // de Meta (Etapa 6) llamarán a esta función con datos de fuera, así que
+  // el string se valida aquí también y no solo en la ruta.
+  if (typeof userMessage !== "string") {
+    throw new Error("userMessage debe ser un string");
+  }
+
   const model = process.env.OPENAI_MODEL;
 
   if (!model) {
