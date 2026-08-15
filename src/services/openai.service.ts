@@ -58,6 +58,10 @@ export async function generateResponse(userMessage: string): Promise<string> {
     model,
     instructions: `${REGLAS}\n\nBASE DE CONOCIMIENTO:\n\n${formatearParaPrompt(conocimiento)}`,
     input: userMessage,
+    // Sin tope, un intento de abuso (o un bug) podría hacer que el modelo
+    // genere una respuesta enorme y la pague nuestra tarjeta. 400 tokens
+    // alcanzan de sobra para el estilo "dos o tres frases" que pedimos.
+    max_output_tokens: 400,
   });
 
   return response.output_text;

@@ -1,11 +1,46 @@
-import { Router } from "express";
+import crypto from "node:crypto";
+
+import { Router, type RequestHandler } from "express";
+
 import { generateResponse } from "../services/openai.service.js";
 
 const router = Router();
 
 const MAX_MESSAGE_LENGTH = 2000;
 
-router.post("/chat", async (req, res) => {
+function igualdadSegura(a: string, b: string): boolean {
+  const ba = Buffer.from(a);
+  const bb = Buffer.from(b);
+
+  if (ba.length !== bb.length) return false;
+
+  return crypto.timingSafeEqual(ba, bb);
+}
+
+/**
+ * Cada llamada a /api/chat cuesta dinero real en OpenAI. Expuesto a internet
+ * sin credencial, un bot ajeno puede vaciar el saldo en horas. El webhook de
+ * Meta no pasa por aquí: ese se autentica con la firma del App Secret.
+ */
+const requiereApiKey: RequestHandler = (req, res, next) => {
+  const esperada = process.env.CHAT_API_KEY;
+
+  if (!esperada) {
+    res.status(503).json({ error: "CHAT_API_KEY no configurada en el servidor" });
+    return;
+  }
+
+  const recibida = req.get("x-api-key");
+
+  if (!recibida || !igualdadSegura(recibida, esperada)) {
+    res.status(401).json({ error: "No autorizado" });
+    return;
+  }
+
+  next();
+};
+
+router.post("/chat", requiereApiKey, async (req, res) => {
   try {
     const { message } = req.body;
 
