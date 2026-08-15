@@ -22,5 +22,6 @@ export const env = {
   metaVerifyToken: () => requerida("META_VERIFY_TOKEN"),
   metaAccessToken: () => requerida("META_ACCESS_TOKEN"),
   metaAppSecret: () => requerida("META_APP_SECRET"),
-  metaGraphVersion: () => process.env.META_GRAPH_VERSION ?? "v23.0",
+  // v26.0 salió el 29 de julio de 2026. Cada versión vive ~2 años.
+  metaGraphVersion: () => process.env.META_GRAPH_VERSION ?? "v26.0",
 };
