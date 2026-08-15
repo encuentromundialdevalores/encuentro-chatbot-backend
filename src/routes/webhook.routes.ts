@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { waitUntil } from "@vercel/functions";
 
 import { env } from "../config/env.js";
 import {
@@ -42,9 +43,18 @@ router.post("/webhook", (req, res) => {
   // nosotros pagaríamos OpenAI cada vez. Confirmamos ya, procesamos después.
   res.sendStatus(200);
 
-  procesar(req.body as MetaWebhookBody).catch((error) => {
+  const tarea = procesar(req.body as MetaWebhookBody).catch((error) => {
     console.error("Error procesando el webhook:", error);
   });
+
+  // En Vercel la función puede congelarse apenas responde, y el trabajo que
+  // quedó pendiente moriría a medias. waitUntil le pide a la plataforma que
+  // espere. En local no hay contexto de Vercel y la promesa corre normal.
+  try {
+    waitUntil(tarea);
+  } catch {
+    // fuera de Vercel no aplica
+  }
 });
 
 async function procesar(body: MetaWebhookBody): Promise<void> {
