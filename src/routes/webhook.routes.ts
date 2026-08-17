@@ -33,7 +33,14 @@ router.get("/webhook", (req, res) => {
 
 router.post("/webhook", (req, res) => {
   if (!firmaValida(req.rawBody, req.get("x-hub-signature-256"))) {
-    console.warn("❌ Webhook con firma inválida, descartado");
+    // Diagnóstico temporal: sin esto, un rechazo no distingue entre "Meta no
+    // mandó firma", "el cuerpo llegó vacío" y "la firma no coincide".
+    console.warn("❌ Webhook rechazado. Diagnóstico:", {
+      object: (req.body as MetaWebhookBody)?.object ?? "(sin object)",
+      contentType: req.get("content-type") ?? "(ninguno)",
+      traeFirma: Boolean(req.get("x-hub-signature-256")),
+      rawBodyBytes: req.rawBody?.length ?? 0,
+    });
     res.sendStatus(403);
     return;
   }
