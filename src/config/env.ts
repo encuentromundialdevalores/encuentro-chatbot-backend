@@ -20,8 +20,13 @@ export const env = {
   openaiModel: () => process.env.OPENAI_MODEL ?? "gpt-5.6-luna",
 
   metaVerifyToken: () => requerida("META_VERIFY_TOKEN"),
-  // Page Access Token (EAA...), para Messenger y WhatsApp vía graph.facebook.com
+  // Page Access Token (EAA...), para Messenger vía graph.facebook.com
   metaAccessToken: () => requerida("META_ACCESS_TOKEN"),
+  // WhatsApp necesita el permiso whatsapp_business_messaging, que el Page
+  // Access Token no trae. Si no se define, cae al Page Token: sirve cuando
+  // ambos salen del mismo usuario del sistema con todos los permisos.
+  metaWhatsappAccessToken: () =>
+    process.env.META_WHATSAPP_ACCESS_TOKEN || requerida("META_ACCESS_TOKEN"),
   // Instagram User Access Token (IGAA...), solo funciona contra graph.instagram.com.
   // Es un tipo de credencial distinto al Page Token, no intercambiables.
   metaInstagramAccessToken: () => requerida("META_INSTAGRAM_ACCESS_TOKEN"),

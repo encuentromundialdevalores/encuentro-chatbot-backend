@@ -121,7 +121,7 @@ function destinoDeEnvio(destino: MensajeEntrante) {
   if (destino.canal === "whatsapp") {
     return {
       url: `https://graph.facebook.com/${version}/${destino.phoneNumberId}/messages`,
-      token: env.metaAccessToken(),
+      token: env.metaWhatsappAccessToken(),
     };
   }
 
