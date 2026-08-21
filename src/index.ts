@@ -1,11 +1,14 @@
 import "dotenv/config";
 
+import crypto from "node:crypto";
+
 import express from "express";
 import cors from "cors";
-import { rateLimit } from "express-rate-limit";
+import { ipKeyGenerator, rateLimit } from "express-rate-limit";
 
 import { env } from "./config/env.js";
 import chatRoutes from "./routes/chat.routes.js";
+import conexionRoutes from "./routes/conexion.routes.js";
 import webhookRoutes from "./routes/webhook.routes.js";
 
 const app = express();
@@ -44,8 +47,34 @@ const limitePorMinuto = (limit: number) =>
     message: { error: "Demasiadas peticiones, espera un minuto" },
   });
 
-app.use("/api", limitePorMinuto(10), chatRoutes);
+// Las plataformas externas (ManyChat y similares) llaman desde sus propios
+// servidores, así que contar por IP metería a todos los usuarios en un mismo
+// cupo diminuto. Cuando viene credencial, el cupo se lleva por credencial y
+// es lo bastante amplio para un evento; sin ella, se limita por IP.
+const limiteChat = rateLimit({
+  windowMs: 60_000,
+  limit: 300,
+  standardHeaders: "draft-7",
+  legacyHeaders: false,
+  message: { error: "Demasiadas peticiones, espera un minuto" },
+  keyGenerator: (req) => {
+    const credencial = req.get("x-api-key");
+
+    if (credencial) {
+      // Hash para no mantener la credencial en memoria del limitador
+      return (
+        "cred:" +
+        crypto.createHash("sha256").update(credencial).digest("hex").slice(0, 16)
+      );
+    }
+
+    return ipKeyGenerator(req.ip ?? "");
+  },
+});
+
+app.use("/api", limiteChat, chatRoutes);
 app.use(limitePorMinuto(120), webhookRoutes);
+app.use(limitePorMinuto(30), conexionRoutes);
 
 app.get("/", (_req, res) => {
   res.json({
